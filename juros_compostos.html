@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Juros Composto</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f8f8;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333333;
+            text-align: left;
+        }
+
+        input, select, button {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #333333;
+            box-sizing: border-box;
+            background-color: #f3f3f3;
+            transition: background-color 0.3s, color 0.3s;
+            text-align: right;
+        }
+
+        input::placeholder {
+            color: #999999;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input:focus, select:focus, button:focus {
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            background-color: #2F3336;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #1A1D1F;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f3f3f3;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        #result strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Juros Composto</h1>
+        <form id="interestForm">
+            <label for="principal">Valor Inicial (R$):</label>
+            <input type="text" id="principal" required><br>
+            <label for="monthly">Investimento Mensal (R$):</label>
+            <input type="text" id="monthly"><br>
+            <label for="rate">Taxa de Juros Anual (%):</label>
+            <input type="text" id="rate" required><br>
+            <label for="period">Período (Meses):</label>
+            <input type="number" id="period" required>
+            <button id="calculateBtn" type="button">Calcular</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        function formatCurrency(input) {
+            var value = input.value.replace(/\D/g, '');
+            value = (value / 100).toFixed(2) + '';
+            value = value.replace(".", ",");
+            value = value.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
+            value = value.replace(/(\d)(\d{3}),/g, "$1.$2,");
+            input.value = value;
+        }
+
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            var principal = parseFloat(document.getElementById('principal').value.replace(/\./g, '').replace(',', '.'));
+            var monthly = parseFloat(document.getElementById('monthly').value.replace(/\./g, '').replace(',', '.')) || 0;
+            var annualRate = parseFloat(document.getElementById('rate').value.replace(/\./g, '').replace(',', '.'));
+            var period = parseInt(document.getElementById('period').value);
+
+            var monthlyRate = annualRate / 12 / 100;
+
+            var totalInvested = principal + (monthly * period);
+
+            var total = principal;
+            for (var i = 0; i < period; i++) {
+                total = (total + monthly) * (1 + monthlyRate);
+            }
+
+            var totalInterest = total - totalInvested - principal; // Correção no cálculo do total em juros
+
+            var resultElement = document.getElementById('result');
+            resultElement.innerHTML = "<strong>Valor total final:</strong> R$" + total.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + "<br>" +
+                                      "<strong>Valor total investido:</strong> R$" + totalInvested.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + "<br>" +
+                                      "<strong>Total em juros:</strong> R$" + totalInterest.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        });
+
+        document.querySelectorAll('input[type="text"]').forEach(function(input) {
+            input.addEventListener('input', function() {
+                formatCurrency(this);
+            });
+        });
+    </script>
+</body>
+</html>
